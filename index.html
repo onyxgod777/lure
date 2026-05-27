@@ -8,6 +8,7 @@
   <meta property="og:title" content="$LURE 🎣">
   <meta property="og:description" content="The bait that catches whales.">
   <meta property="og:image" content="https://claw.thealpha-secret.xyz/img/lure-logo.svg">
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -20,60 +21,89 @@
       align-items: center;
     }
     .container { max-width: 600px; width: 100%; padding: 40px 20px; text-align: center; }
-    .logo { width: 200px; height: 200px; margin: 0 auto 30px; }
+    .logo { width: 180px; height: 180px; margin: 0 auto 20px; }
     .logo img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 20px rgba(255,215,0,0.3)); }
     h1 {
-      font-size: 3em;
+      font-size: 2.6em;
       background: linear-gradient(135deg, #ffd700, #ff8c00);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .subtitle { color: #888; font-size: 1.1em; margin: 10px 0 30px; }
-    .tagline { font-size: 1.4em; color: #ffd700; margin-bottom: 30px; font-style: italic; }
+    .subtitle { color: #888; font-size: 1em; margin: 8px 0 25px; }
+    .tagline { font-size: 1.3em; color: #ffd700; margin-bottom: 25px; font-style: italic; }
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin: 30px 0;
+      gap: 12px;
+      margin: 25px 0;
     }
     .stat-card {
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,215,0,0.2);
       border-radius: 12px;
-      padding: 20px;
+      padding: 18px;
     }
-    .stat-card .label { color: #888; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
-    .stat-card .value { color: #ffd700; font-size: 1.8em; font-weight: bold; margin-top: 5px; }
-    .stat-card .value.loading { color: #666; font-size: 1em; }
+    .stat-card .label { color: #888; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-card .value { color: #ffd700; font-size: 1.5em; font-weight: bold; margin-top: 4px; }
+    .stat-card .value.loading { color: #666; font-size: 0.9em; }
+    .progress-bar {
+      background: rgba(255,255,255,0.08);
+      border-radius: 20px;
+      height: 12px;
+      margin: 8px 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ffd700, #ff8c00);
+      border-radius: 20px;
+      transition: width 1s ease;
+    }
+    .chart-container {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,215,0,0.15);
+      border-radius: 12px;
+      padding: 10px;
+      margin: 20px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .chart-container iframe {
+      width: 100%;
+      height: 420px;
+      border: none;
+      border-radius: 8px;
+    }
     .btn {
       display: inline-block;
-      padding: 16px 40px;
+      padding: 14px 36px;
       border-radius: 12px;
       text-decoration: none;
       font-weight: bold;
-      font-size: 1.1em;
-      margin: 10px;
+      font-size: 1em;
+      margin: 8px;
       transition: all 0.2s;
     }
     .btn-primary { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,215,0,0.3); }
     .btn-secondary { background: transparent; border: 2px solid #ffd700; color: #ffd700; }
     .btn-secondary:hover { background: rgba(255,215,0,0.1); }
-    .links { margin: 40px 0; }
-    .links a { color: #ffd700; text-decoration: none; margin: 0 15px; font-size: 0.9em; }
+    .links { margin: 30px 0; }
+    .links a { color: #ffd700; text-decoration: none; margin: 0 12px; font-size: 0.85em; }
     .links a:hover { text-decoration: underline; }
-    .footer { color: #444; font-size: 0.8em; margin-top: 60px; padding: 20px; }
+    .footer { color: #444; font-size: 0.75em; margin-top: 40px; padding: 20px; }
     #mint-address { 
       background: rgba(255,255,255,0.05); 
-      padding: 12px; 
+      padding: 10px; 
       border-radius: 8px; 
       font-family: monospace; 
-      font-size: 0.8em;
+      font-size: 0.75em;
       word-break: break-all;
-      margin: 20px 0;
+      margin: 15px 0;
       color: #888;
     }
+    .bonding-label { display: flex; justify-content: space-between; font-size: 0.8em; color: #888; }
   </style>
 </head>
 <body>
@@ -99,20 +129,33 @@
         <div class="value loading" id="price">Loading...</div>
       </div>
       <div class="stat-card">
-        <div class="label">Total Supply</div>
-        <div class="value" id="supply">1,000,000,000</div>
+        <div class="label">Bonding</div>
+        <div class="value loading" id="bonding-pct">Loading...</div>
       </div>
     </div>
 
-    <div id="mint-address">Contract: GF7QcQcMcedTFXv8NR2wYHKXbp6gn7iiquuLmkBZZFET</div>
+    <div class="bonding-label">
+      <span>0%</span>
+      <span>Bonding Curve Progress</span>
+      <span>100% → Raydium</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
 
-    <div style="margin: 20px 0;">
-      <a class="btn btn-primary" href="https://pump.fun/coin/GF7QcQcMcedTFXv8NR2wYHKXbp6gn7iiquuLmkBZZFET">🛒 Buy $LURE</a>
+    <div id="mint-address">Contract: JtAs1ma3WXNy5ApDvpcHfzSAc4oyVmLSszoBLkBB68s</div>
+
+    <div class="chart-container">
+      <iframe src="https://dexscreener.com/solana/JtAs1ma3WXNy5ApDvpcHfzSAc4oyVmLSszoBLkBB68s?embed=1&theme=dark" title="$LURE Chart"></iframe>
+    </div>
+
+    <div style="margin: 15px 0;">
+      <a class="btn btn-primary" href="https://pump.fun/coin/JtAs1ma3WXNy5ApDvpcHfzSAc4oyVmLSszoBLkBB68s">🛒 Buy $LURE</a>
       <a class="btn btn-secondary" href="https://t.me/+ID9tmiVfKFNlYTkx">💬 Telegram</a>
     </div>
 
     <div class="links">
-      <a href="https://solscan.io/token/GF7QcQcMcedTFXv8NR2wYHKXbp6gn7iiquuLmkBZZFET">🔍 Solscan</a>
+      <a href="https://solscan.io/token/JtAs1ma3WXNy5ApDvpcHfzSAc4oyVmLSszoBLkBB68s">🔍 Solscan</a>
       <a href="https://claw.thealpha-secret.xyz">🦞 $CLAW</a>
       <a href="https://t.me/+ID9tmiVfKFNlYTkx">💬 Community</a>
     </div>
@@ -124,25 +167,63 @@
   </div>
 
   <script>
-    const MINT = "GF7QcQcMcedTFXv8NR2wYHKXbp6gn7iiquuLmkBZZFET";
+    const TOKEN_ADDRESS = "JtAs1ma3WXNy5ApDvpcHfzSAc4oyVmLSszoBLkBB68s";
+
     async function loadData() {
+      // Fetch from DexScreener API for price, market cap, and liquidity
       try {
-        const resp = await fetch(`https://frontend-api.pump.fun/coins/${MINT}`);
-        const data = await resp.json();
-        document.getElementById('market-cap').textContent = `$${(data.market_cap || 0).toLocaleString()}`;
-        document.getElementById('market-cap').className = 'value';
-        document.getElementById('holders').textContent = data.holder_count || '0';
-        document.getElementById('holders').className = 'value';
-        document.getElementById('price').textContent = `$${(data.usd_price || 0).toLocaleString()}`;
-        document.getElementById('price').className = 'value';
+        const resp = await fetch(`https://api.dexscreener.com/latest/dex/token/${TOKEN_ADDRESS}`);
+        const d = await resp.json();
+        const pair = d?.pairs?.[0];
+        if (pair) {
+          const price = parseFloat(pair.priceUsd) || 0;
+          const mc = parseFloat(pair.fdv) || 0;
+          const liq = parseFloat(pair.liquidity?.usd) || 0;
+
+          document.getElementById('price').textContent = price > 0.000001
+            ? `$${price.toFixed(6)}`
+            : `$${price.toExponential(4)}`;
+          document.getElementById('price').className = 'value';
+
+          document.getElementById('market-cap').textContent = mc > 0
+            ? `$${(mc).toLocaleString(undefined, {maximumFractionDigits: 0})}`
+            : '—';
+          document.getElementById('market-cap').className = 'value';
+
+          // Bonding curve progress from DexScreener (ratio of current liq to target)
+          const targetLiq = 69000; // ~$69K target for Raydium migration
+          const progress = liq > 0 ? Math.min(100, (liq / targetLiq) * 100) : 0;
+          document.getElementById('bonding-pct').textContent = `${progress.toFixed(1)}%`;
+          document.getElementById('bonding-pct').className = 'value';
+          document.getElementById('progress-fill').style.width = `${Math.min(100, progress)}%`;
+        }
       } catch(e) {
-        document.getElementById('market-cap').textContent = '—';
-        document.getElementById('holders').textContent = '—';
-        document.getElementById('price').textContent = '—';
+        console.log("DexScreener error:", e.message);
+      }
+
+      // Fetch holders from Solscan public API
+      try {
+        const resp = await fetch(`https://api.solscan.io/token/holders?tokenAddress=${TOKEN_ADDRESS}&limit=1&offset=0`);
+        const d = await resp.json();
+        const count = d?.total || d?.data?.total || d?.result?.total || d?.totalItems || '—';
+        document.getElementById('holders').textContent = count;
+        document.getElementById('holders').className = 'value';
+      } catch(e) {
+        // Fallback: try Birdeye
+        try {
+          const resp2 = await fetch(`https://public-api.birdeye.so/defi/token_overview?address=${TOKEN_ADDRESS}`);
+          const d2 = await resp2.json();
+          document.getElementById('holders').textContent = d2?.data?.holder || '—';
+          document.getElementById('holders').className = 'value';
+        } catch(e2) {
+          console.log("Holders fetch error:", e2.message);
+        }
       }
     }
+
     loadData();
-    setInterval(loadData, 30000);
+    // Refresh every 60 seconds
+    setInterval(loadData, 60000);
   </script>
 </body>
 </html>
